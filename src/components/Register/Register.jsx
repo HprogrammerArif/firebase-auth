@@ -3,8 +3,9 @@ import { AuthContext } from "../AuthProvider/AuthProvider";
 
 const Register = () => {
   const [error, setError] = useState("");
+  const [emailError, setEmailError] = useState("");
 
-  const { registerUser } = useContext(AuthContext);
+  const { registerUser, setUser } = useContext(AuthContext);
   // console.log(registerUser);
 
   const handleRegister = (e) => {
@@ -17,21 +18,35 @@ const Register = () => {
 
     console.log(name, photo, email, password, confirmPassword);
 
+    if (!/@gmail\.com$/.test(email)) {
+      setEmailError("Please correct your email address");
+      return;
+    }
+
     if (password.length < 6) {
       setError("Password must bs 6 character or more");
       return;
-    } 
+    }
     if (password !== confirmPassword) {
       setError("Password didn't match");
       return;
     }
     if (!/\d{1,}$/.test(password)) {
       setError("Password ends with at least 1 number");
-      return
+      return;
     }
-    setError('');
+    setError("");
+    setEmailError("");
 
-    registerUser(email, password);
+    registerUser(email, password)
+      .then((result) => {
+        const user = result.user;
+        console.log(user);
+        setUser(user)
+      })
+      .catch((error) => {
+        setError(error.message.split('/')[1]);
+      });
   };
 
   return (
@@ -83,6 +98,7 @@ const Register = () => {
           />
         </div>
         {error && <small className="text-red-600">{error}</small>}
+        {emailError && <small className="text-red-600">{emailError}</small>}
         <button type="submit" className="btn btn-primary w-full">
           Register
         </button>

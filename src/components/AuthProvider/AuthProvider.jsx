@@ -1,39 +1,40 @@
 import { createContext, useState } from "react";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+  FacebookAuthProvider
+} from "firebase/auth";
 import { auth } from "../../Firebase/Firebase.init";
-
 export const AuthContext = createContext(null);
 
+
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState("Value to ekhono nai");
+  const [user, setUser] = useState(null);
+  const googleProvider = new GoogleAuthProvider();
+  const facebookProvider = new FacebookAuthProvider();
 
 
   const registerUser = (email, password) => {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((result) => {
-        const user = result.user;
-        console.log(user);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    return createUserWithEmailAndPassword(auth, email, password);
   };
-
 
   const loginUser = (email, password) => {
-    signInWithEmailAndPassword(auth, email, password)
-      .then((result) => {
-        const user = result.user;
-        console.log(user);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    return signInWithEmailAndPassword(auth, email, password);
   };
 
 
+  const googleLogin = () => {
+    return signInWithPopup(auth, googleProvider)
+  }
 
-  const authInfo = { user, registerUser, loginUser };
+  const facebookLogin = () => {
+    return signInWithPopup(auth, facebookProvider)
+  }
+
+
+  const authInfo = { user, setUser, registerUser, loginUser, googleLogin, facebookLogin };
 
   return (
     <div>
